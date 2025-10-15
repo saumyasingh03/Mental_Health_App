@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { LogIn, UserPlus, Heart, Zap, MessageCircle, User, MessageSquare, Briefcase, ChevronRight, CheckCircle, Home, LayoutDashboard, Settings } from 'lucide-react';
-import axios from 'axios'
 
 // --- Global Constants ---
 const QUIZ_QUESTIONS = [
@@ -136,7 +135,7 @@ const App = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
         <h1 className="text-2xl font-bold text-indigo-600 cursor-pointer" onClick={() => setPage('landing')}>
           <Heart className="inline-block w-6 h-6 mr-1" />
-          MindSpace
+          Mentify
         </h1>
         <nav className="hidden md:flex space-x-4">
           {!isAuthenticated && (
@@ -247,122 +246,88 @@ const App = () => {
     </div>
   );
 
+  const AuthForm = ({ type }) => {
+    const isLogin = type === 'login';
+    const title = isLogin ? 'Welcome Back' : 'Create Account';
+    const buttonText = isLogin ? 'Login' : 'Sign Up';
 
-const AuthForm = ({ type, setPage }) => {
-  const isLogin = type === 'login';
-  const title = isLogin ? 'Welcome Back' : 'Create Account';
-  const buttonText = isLogin ? 'Login' : 'Sign Up';
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [name, setName] = useState('');
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      handleAuth(type);
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError('');
-    setLoading(true);
+    return (
+      <div className="min-h-screen pt-20 flex items-center justify-center bg-gray-100">
+        <form onSubmit={handleSubmit} className="w-full max-w-md p-8 bg-white rounded-xl shadow-2xl">
+          <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">{title}</h2>
+          <p className="text-center text-gray-500 mb-8">Join the journey to better mental health.</p>
 
-    try {
-      if (isLogin) {
-        // Login request
-        const res = await axios.post('http://localhost:3000/api/auth/login', { email, password });
-        console.log('Login success:', res.data);
-        // Save token in localStorage or context
-        localStorage.setItem('token', res.data.token);
-        // Optionally redirect or set user state
-      } else {
-        // Signup request
-        const res = await axios.post('http://localhost:3000/api/auth/register', { name, email, password });
-        console.log('Signup success:', res.data);
-        // Optionally log in user automatically after signup
-        localStorage.setItem('token', res.data.token);
-      }
-      setLoading(false);
-    } catch (err) {
-      console.error(err);
-      setError(err.response?.data?.message || 'Something went wrong');
-      setLoading(false);
-    }
-  };
+          {!isLogin && (
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-medium mb-2">Name</label>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
+                placeholder="Enter your name"
+                required
+              />
+            </div>
+          )}
 
-  return (
-    <div className="min-h-screen pt-20 flex items-center justify-center bg-gray-100">
-      <form onSubmit={handleSubmit} className="w-full max-w-md p-8 bg-white rounded-xl shadow-2xl">
-        <h2 className="text-3xl font-bold text-center text-indigo-600 mb-6">{title}</h2>
-        <p className="text-center text-gray-500 mb-8">Join the journey to better mental health.</p>
-
-        {error && <p className="text-red-500 text-sm mb-4 text-center">{error}</p>}
-
-        {!isLogin && (
           <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-medium mb-2">Name</label>
+            <label className="block text-gray-700 text-sm font-medium mb-2">Email</label>
             <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
-              placeholder="Enter your name"
+              placeholder="you@example.com"
               required
             />
           </div>
-        )}
 
-        <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-medium mb-2">Email</label>
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
-            placeholder="you@example.com"
-            required
-          />
-        </div>
+          <div className="mb-6">
+            <label className="block text-gray-700 text-sm font-medium mb-2">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
+              placeholder="********"
+              required
+            />
+            {isLogin && (
+                <a href="#" className="text-xs text-indigo-500 hover:text-indigo-600 float-right mt-1">Forgot Password?</a>
+            )}
+          </div>
 
-        <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-medium mb-2">Password</label>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition duration-150"
-            placeholder="********"
-            required
-          />
-          {isLogin && (
-            <a href="#" className="text-xs text-indigo-500 hover:text-indigo-600 float-right mt-1">Forgot Password?</a>
-          )}
-        </div>
-
-        <button
-          type="submit"
-          disabled={loading}
-          className={`w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md transition duration-200 transform hover:scale-[1.01] ${
-            loading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-indigo-700'
-          }`}
-        >
-          {loading ? 'Processing...' : buttonText}
-        </button>
-
-        <p className="mt-6 text-center text-sm text-gray-600">
-          {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
           <button
-            type="button"
-            className="text-indigo-600 font-semibold hover:text-indigo-700"
-            onClick={() => setPage(isLogin ? 'signup' : 'login')}
+            type="submit"
+            className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-indigo-700 transition duration-200 transform hover:scale-[1.01]"
           >
-            {isLogin ? 'Sign Up' : 'Login'}
+            {buttonText}
           </button>
-        </p>
-      </form>
-    </div>
-  );
-};
-
-
-
+          
+          <p className="mt-6 text-center text-sm text-gray-600">
+            {isLogin ? "Don't have an account?" : "Already have an account?"}{' '}
+            <button
+              type="button"
+              className="text-indigo-600 font-semibold hover:text-indigo-700"
+              onClick={() => setPage(isLogin ? 'signup' : 'login')}
+            >
+              {isLogin ? 'Sign Up' : 'Login'}
+            </button>
+          </p>
+        </form>
+      </div>
+    );
+  };
 
   const QuizScreen = () => {
     const currentQuestion = QUIZ_QUESTIONS[currentQuestionIndex];
@@ -821,53 +786,13 @@ const AuthForm = ({ type, setPage }) => {
     );
   };
 
- const ContactPage = () => {
+  const ContactPage = () => {
     const [isSubmitted, setIsSubmitted] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        subject: '',
-        message: '',
-    });
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setIsLoading(true);
-        setError(null);
-        
-        try {
-            // 1. Axios API Call
-            const response = await axios.post(`http://localhost:3000/api/contact/`, formData, {
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-
-            console.log("Contact Form Submitted successfully:", response.data);
-            
-            // 2. Show Success State
-            setIsSubmitted(true);
-            
-            // 3. Reset form data and success state after a delay
-            setFormData({ name: '', email: '', subject: '', message: '' });
-            setTimeout(() => { 
-                setIsSubmitted(false);
-            }, 5000); 
-
-        } catch (err) {
-            console.error("Contact Form Submission Failed:", err);
-            // 4. Show Error Message
-            setError('Failed to send message. Please check your network and try again.');
-
-        } finally {
-            setIsLoading(false);
-        }
+        setIsSubmitted(true);
+        setTimeout(() => { setIsSubmitted(false); console.log("Contact Form Submitted"); }, 3000);
     };
 
     return (
@@ -876,12 +801,6 @@ const AuthForm = ({ type, setPage }) => {
             <p className="text-gray-500 mb-8">Have a question or need technical support? Send us a message.</p>
 
             <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-3xl">
-                {error && (
-                    <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg font-medium">
-                        {error}
-                    </div>
-                )}
-
                 {isSubmitted ? (
                     <div className="text-center py-10">
                         <CheckCircle className="w-16 h-16 mx-auto text-green-500" />
@@ -893,62 +812,27 @@ const AuthForm = ({ type, setPage }) => {
                         <div className="space-y-4 mb-6">
                             <div>
                                 <label className="block text-gray-700 text-sm font-medium mb-2">Your Name</label>
-                                <input 
-                                    type="text" 
-                                    name="name" 
-                                    value={formData.name} 
-                                    onChange={handleChange} 
-                                    placeholder="John Doe" 
-                                    className="w-full px-4 py-2 border rounded-lg" 
-                                    required 
-                                />
+                                <input type="text" placeholder="John Doe" className="w-full px-4 py-2 border rounded-lg" required />
                             </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-medium mb-2">Your Email</label>
-                                <input 
-                                    type="email" 
-                                    name="email" 
-                                    value={formData.email} 
-                                    onChange={handleChange} 
-                                    placeholder="john.doe@email.com" 
-                                    className="w-full px-4 py-2 border rounded-lg" 
-                                    required 
-                                />
+                                <input type="email" placeholder="john.doe@email.com" className="w-full px-4 py-2 border rounded-lg" required />
                             </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-medium mb-2">Subject</label>
-                                <input 
-                                    type="text" 
-                                    name="subject" 
-                                    value={formData.subject} 
-                                    onChange={handleChange} 
-                                    placeholder="Account Issue / Feedback / General Inquiry" 
-                                    className="w-full px-4 py-2 border rounded-lg" 
-                                    required 
-                                />
+                                <input type="text" placeholder="Account Issue / Feedback / General Inquiry" className="w-full px-4 py-2 border rounded-lg" required />
                             </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-medium mb-2">Message</label>
-                                <textarea 
-                                    rows="6" 
-                                    name="message" 
-                                    value={formData.message} 
-                                    onChange={handleChange} 
-                                    placeholder="Type your message here..." 
-                                    className="w-full p-4 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" 
-                                    required
-                                ></textarea>
+                                <textarea rows="6" placeholder="Type your message here..." className="w-full p-4 border rounded-lg focus:ring-indigo-500 focus:border-indigo-500" required></textarea>
                             </div>
                         </div>
 
                         <button
                             type="submit"
-                            disabled={isLoading}
-                            className={`w-full text-white font-semibold py-3 rounded-lg shadow-md transition ${
-                                isLoading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'
-                            }`}
+                            className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-lg shadow-md hover:bg-indigo-700 transition"
                         >
-                            {isLoading ? 'Sending...' : 'Send Message'}
+                            Send Message
                         </button>
                     </form>
                 )}
