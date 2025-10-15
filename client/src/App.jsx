@@ -1,4 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import Face from "./components/face";
+import ChatBot from "./components/chatbot";
 import { LogIn, UserPlus, Heart, Zap, MessageCircle, User, MessageSquare, Briefcase, ChevronRight, CheckCircle, Home, LayoutDashboard, Settings } from 'lucide-react';
 
 // --- Global Constants ---
@@ -27,6 +29,10 @@ const App = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState({});
   const [isQuizSubmitted, setIsQuizSubmitted] = useState(false);
+
+  const [showFaceModal, setShowFaceModal] = useState(false);
+  const [showChatModal, setShowChatModal] = useState(false);
+
 
   // --- Auth & Navigation Logic ---
   const handleAuth = (type) => {
@@ -128,50 +134,163 @@ const App = () => {
     }
   }, [quizResult]);
 
+
+
+
   // --- UI Components Start Here ---
 
-  const Header = () => (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
+const Header = () => (
+  <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-indigo-600 cursor-pointer" onClick={() => setPage('landing')}>
+        {/* Logo */}
+        <h1
+          className="text-2xl font-bold text-indigo-600 cursor-pointer flex items-center"
+          onClick={() => setPage("landing")}
+        >
           <Heart className="inline-block w-6 h-6 mr-1" />
           Mentify
         </h1>
-        <nav className="hidden md:flex space-x-4">
-          {!isAuthenticated && (
+
+        {/* Navbar */}
+        <nav className="hidden md:flex space-x-4 items-center">
+          {!isAuthenticated ? (
             <>
-              <button className="text-gray-600 hover:text-indigo-600 font-medium" onClick={() => setPage('landing')}>Home</button>
-              <button className="text-gray-600 hover:text-indigo-600 font-medium" onClick={() => setPage('community')}>Stories</button>
-              <button className="text-gray-600 hover:text-indigo-600 font-medium" onClick={() => setPage('contact')}>Support</button>
-            </>
-          )}
-          {isAuthenticated ? (
-             <>
-                <button className="text-gray-600 hover:text-indigo-600 font-medium" onClick={() => setPage('dashboard')}>Dashboard</button>
-                <button className="text-gray-600 hover:text-indigo-600 font-medium" onClick={() => setPage('community')}>Community</button>
-                <button className="text-gray-600 hover:text-indigo-600 font-medium" onClick={() => setPage('profile')}>Profile</button>
-                <button className="bg-red-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-600 transition duration-200 flex items-center" onClick={handleLogout}>
-                    <LogIn className="w-4 h-4 mr-2" /> Logout
-                </button>
-             </>
-          ) : (
-            <>
-              <button className="bg-indigo-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-indigo-600 transition duration-200" onClick={() => setPage('login')}>
+              <button
+                className="text-gray-600 hover:text-indigo-600 font-medium"
+                onClick={() => setPage("landing")}
+              >
+                Home
+              </button>
+              <button
+                className="text-gray-600 hover:text-indigo-600 font-medium"
+                onClick={() => setPage("community")}
+              >
+                Stories
+              </button>
+              <button
+                className="text-gray-600 hover:text-indigo-600 font-medium"
+                onClick={() => setPage("contact")}
+              >
+                Support
+              </button>
+
+              {/* Emotion Detector (Modal) */}
+              <button
+                className="text-gray-600 hover:text-indigo-600 font-medium"
+                onClick={() => {
+                  setShowFaceModal(true);
+                  setShowChatModal(false);
+                }}
+              >
+                Emotion Detector
+              </button>
+
+              {/* Chat with Mentor (Modal) */}
+              <button
+                className="text-gray-600 hover:text-indigo-600 font-medium"
+                onClick={() => {
+                  setShowChatModal(true);
+                  setShowFaceModal(false);
+                }}
+              >
+                Chat with Mentor
+              </button>
+
+              <button
+                className="bg-indigo-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-indigo-600 transition duration-200"
+                onClick={() => setPage("login")}
+              >
                 Login
               </button>
-              <button className="bg-transparent border border-indigo-500 text-indigo-600 px-4 py-2 rounded-full hover:bg-indigo-50 transition duration-200" onClick={() => setPage('signup')}>
+              <button
+                className="bg-transparent border border-indigo-500 text-indigo-600 px-4 py-2 rounded-full hover:bg-indigo-50 transition duration-200"
+                onClick={() => setPage("signup")}
+              >
                 Sign Up
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="text-gray-600 hover:text-indigo-600 font-medium"
+                onClick={() => setPage("dashboard")}
+              >
+                Dashboard
+              </button>
+              <button
+                className="text-gray-600 hover:text-indigo-600 font-medium"
+                onClick={() => setPage("community")}
+              >
+                Community
+              </button>
+              <button
+                className="text-gray-600 hover:text-indigo-600 font-medium"
+                onClick={() => setPage("profile")}
+              >
+                Profile
+              </button>
+              <button
+                className="bg-red-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-600 transition duration-200 flex items-center"
+                onClick={handleLogout}
+              >
+                <LogIn className="w-4 h-4 mr-2" /> Logout
               </button>
             </>
           )}
         </nav>
-        {/* Mobile Menu Button */}
+
+        {/* Mobile Menu (optional) */}
         <button className="md:hidden p-2 rounded-md text-gray-700 hover:bg-gray-100 transition">
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+          <svg
+            className="w-6 h-6"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M4 6h16M4 12h16m-7 6h7"
+            ></path>
+          </svg>
         </button>
       </div>
+
+      {/* Face Modal */}
+      {showFaceModal && (
+        <div className="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center z-[60]">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 relative">
+            <button
+              className="text-red-500 absolute top-2 right-3 text-xl font-bold"
+              onClick={() => setShowFaceModal(false)}
+            >
+              &times;
+            </button>
+            <Face />
+          </div>
+        </div>
+      )}
+
+      {/* ChatBot Modal */}
+      {showChatModal && (
+        <div className="fixed inset-0 bg-white bg-opacity-50 flex justify-center items-center z-[60]">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 relative">
+            <button
+              className="text-red-500 absolute top-2 right-3 text-xl font-bold"
+              onClick={() => setShowChatModal(false)}
+            >
+              &times;
+            </button>
+            <ChatBot />
+          </div>
+        </div>
+      )}
     </header>
-  );
+);
+
+
 
   const LandingPage = () => (
     <div className="min-h-screen pt-20 bg-gray-50">
