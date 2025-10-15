@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 const { Schema } = mongoose;
 
 const CounselorSchema = new Schema({
@@ -23,7 +23,7 @@ const CounselorSchema = new Schema({
   },
   imageUrl: {
     type: String, // URL to the counselor's profile picture
-    default: 'https://i.ibb.co/61LdwW4/user-default.png', // A default user image
+    default: 'https://i.ibb.co/61LdwW4/user-default.png', // Default image
   },
   createdAt: {
     type: Date,
@@ -33,4 +33,4 @@ const CounselorSchema = new Schema({
 
 const Counselor = mongoose.model('Counselor', CounselorSchema);
 
-module.exports = Counselor;
+export default Counselor;

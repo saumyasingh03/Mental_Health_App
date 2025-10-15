@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { submitContactForm, getContactSubmissions } from '../components/contactController.js';
+
 const router = express.Router();
-const { submitContactForm, getContactSubmissions } = require('../controllers/contactController');
 
 // Route for submitting the contact form
 router.post('/', submitContactForm);
@@ -8,4 +9,4 @@ router.post('/', submitContactForm);
 // Route for getting all submissions (for admin)
 router.get('/', getContactSubmissions);
 
-module.exports = router;
+export default router;

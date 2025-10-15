@@ -1,7 +1,6 @@
-const QuizResponse = require('../models/QuizResponse');
+import QuizResponse from '../models/QuizResponse.js';
 
 // --- Data for the 10 questions ---
-// Isko hum baad me database se bhi la sakte hain, abhi ke liye simple rakhte hain.
 const questions = [
   {
     id: 1,
@@ -105,84 +104,74 @@ const questions = [
   },
 ];
 
-
-// Function to get all quiz questions
-exports.getQuizQuestions = (req, res) => {
+// --- Get all quiz questions ---
+export const getQuizQuestions = (req, res) => {
   try {
-    // We just send the hardcoded questions array
     res.status(200).json(questions);
   } catch (error) {
     res.status(500).json({ message: 'Server error, please try again later.' });
   }
 };
 
+// --- Submit quiz answers ---
+export const submitQuiz = async (req, res) => {
+  const { answers } = req.body;
 
-// Function to submit quiz answers
-exports.submitQuiz = async (req, res) => {
-  const { answers } = req.body; // Expecting an array of 10 numbers like [1, 2, 0, 3, ...]
-
-  // --- Basic Validation ---
   if (!answers || !Array.isArray(answers) || answers.length !== 10) {
     return res.status(400).json({ message: 'Please provide 10 answers.' });
   }
 
   try {
-    // --- Scoring Logic (Simple Sum) ---
     const score = answers.reduce((total, current) => total + current, 0);
 
-    // --- Categorization Logic ---
     let category = 'none';
     let dailyPlan = [];
-    
-    // (Total possible score is 30, since each of 10 questions has max value 3)
+
     if (score >= 1 && score <= 9) {
       category = 'mild';
       dailyPlan = [
-        "Aaj 15 minute ke liye halki walk par jaayein.",
-        "Apne pasand ka koi gaana sunein.",
-        "Raat ko sone se pehle 3 aisi cheezein sochein jinke liye aap shukraguzar hain."
+        'Aaj 15 minute ke liye halki walk par jaayein.',
+        'Apne pasand ka koi gaana sunein.',
+        'Raat ko sone se pehle 3 aisi cheezein sochein jinke liye aap shukraguzar hain.',
       ];
     } else if (score >= 10 && score <= 19) {
       category = 'moderate';
       dailyPlan = [
-        "Aaj 20 minute tak aisi exercise karein jisse halka pasina aaye (jaise jogging ya cycling).",
-        "Kisi dost ya parivaar ke sadasya se 10 minute baat karein.",
-        "Apne din ko plan karne ke liye ek choti to-do list banayein."
+        'Aaj 20 minute tak aisi exercise karein jisse halka pasina aaye (jaise jogging ya cycling).',
+        'Kisi dost ya parivaar ke sadasya se 10 minute baat karein.',
+        'Apne din ko plan karne ke liye ek choti to-do list banayein.',
       ];
     } else if (score >= 20) {
       category = 'severe';
       dailyPlan = [
-        "Yeh zaroori hai ki aap kisi professional se salah lein. Humne aapke liye kuch helpline numbers diye hain.",
-        "Aaj 5 minute ke liye gehri saans lene ki practice karein.",
-        "Ek surakshit aur shaant jagah par thoda samay bitayein."
+        'Yeh zaroori hai ki aap kisi professional se salah lein. Humne aapke liye kuch helpline numbers diye hain.',
+        'Aaj 5 minute ke liye gehri saans lene ki practice karein.',
+        'Ek surakshit aur shaant jagah par thoda samay bitayein.',
       ];
     } else {
-        category = 'none';
-        dailyPlan = [
-            "Aapka score bahut accha hai! Apni mental health ko aise hi maintain karein.",
-            "Aaj kuch naya seekhne ki koshish karein.",
-            "Apni kisi hobby ke liye samay nikalein."
-        ];
+      category = 'none';
+      dailyPlan = [
+        'Aapka score bahut accha hai! Apni mental health ko aise hi maintain karein.',
+        'Aaj kuch naya seekhne ki koshish karein.',
+        'Apni kisi hobby ke liye samay nikalein.',
+      ];
     }
 
-
-    // --- Save to Database ---
+    // Save response
     const newResponse = new QuizResponse({
       answers,
       score,
       category,
-      user: req.user.id, // <-- YEH LINE ADD KARO (req.user middleware se aayega)
+      user: req.user.id,
     });
     await newResponse.save();
 
-    // --- Send Response to Frontend ---
     res.status(201).json({
       message: 'Quiz submitted successfully!',
       score,
       category,
       dailyPlan,
     });
-
   } catch (error) {
     console.error('Error submitting quiz:', error);
     res.status(500).json({ message: 'Server error, please try again.' });

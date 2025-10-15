@@ -1,5 +1,5 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const UserSchema = new mongoose.Schema({
   name: {
@@ -19,7 +19,7 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Please provide a password'],
     minlength: 6,
-    select: false, // Jab hum user data fetch karenge to password by default nahi aayega
+    select: false, // Password by default nahi aayega jab user fetch kare
   },
   role: {
     type: String,
@@ -34,13 +34,13 @@ const UserSchema = new mongoose.Schema({
 
 // Password ko save karne se pehle HASH karo
 UserSchema.pre('save', async function (next) {
-  // Agar password modify nahi hua hai to aage badho
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 // Password compare karne ke liye method
@@ -50,4 +50,4 @@ UserSchema.methods.matchPassword = async function (enteredPassword) {
 
 const User = mongoose.model('User', UserSchema);
 
-module.exports = User;
+export default User;

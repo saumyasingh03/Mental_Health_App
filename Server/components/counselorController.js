@@ -1,9 +1,9 @@
-const Counselor = require('../models/Counselor');
+import Counselor from '../models/Counselor.js';
 
 // @desc    Get all counselors
 // @route   GET /api/counselors
 // @access  Public
-exports.getAllCounselors = async (req, res) => {
+export const getAllCounselors = async (req, res) => {
   try {
     const counselors = await Counselor.find({});
     res.status(200).json(counselors);
@@ -16,7 +16,7 @@ exports.getAllCounselors = async (req, res) => {
 // @desc    Add a new counselor
 // @route   POST /api/counselors
 // @access  Private (in future, this will be admin-only)
-exports.addCounselor = async (req, res) => {
+export const addCounselor = async (req, res) => {
   try {
     const { name, specialization, bio, contactNumber, imageUrl } = req.body;
 

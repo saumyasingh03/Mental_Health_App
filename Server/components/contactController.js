@@ -1,9 +1,9 @@
-const ContactSubmission = require('../models/ContactSubmission');
+import ContactSubmission from '../models/ContactSubmission.js';
 
 // @desc    Submit a contact form
 // @route   POST /api/contact
 // @access  Public
-exports.submitContactForm = async (req, res) => {
+export const submitContactForm = async (req, res) => {
   try {
     const { name, email, message } = req.body;
 
@@ -31,16 +31,15 @@ exports.submitContactForm = async (req, res) => {
   }
 };
 
-
 // @desc    Get all contact submissions (for Admin in the future)
 // @route   GET /api/contact
 // @access  Private (Admin only)
-exports.getContactSubmissions = async (req, res) => {
-    try {
-        const submissions = await ContactSubmission.find({}).sort({ createdAt: -1 }); // Naye waale pehle
-        res.status(200).json(submissions);
-    } catch (error) {
-        console.error('Error fetching submissions:', error);
-        res.status(500).json({ message: 'Server error while fetching submissions.' });
-    }
+export const getContactSubmissions = async (req, res) => {
+  try {
+    const submissions = await ContactSubmission.find({}).sort({ createdAt: -1 }); // Newest first
+    res.status(200).json(submissions);
+  } catch (error) {
+    console.error('Error fetching submissions:', error);
+    res.status(500).json({ message: 'Server error while fetching submissions.' });
+  }
 };

@@ -1,6 +1,7 @@
-const express = require('express');
+import express from 'express';
+import { getAllCounselors, addCounselor } from '../components/counselorController.js';
+
 const router = express.Router();
-const { getAllCounselors, addCounselor } = require('../controllers/counselorController');
 
 // Route to get the list of all counselors
 router.get('/', getAllCounselors);
@@ -8,4 +9,4 @@ router.get('/', getAllCounselors);
 // Route to add a new counselor
 router.post('/', addCounselor);
 
-module.exports = router;
+export default router;
